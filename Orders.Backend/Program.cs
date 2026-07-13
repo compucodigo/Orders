@@ -1,8 +1,12 @@
+using Microsoft.EntityFrameworkCore;
+using Orders.Backend.Data;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
+builder.Services.AddDbContext<DataContext>(x => x.UseSqlServer("name=LocalCnn"));
 
 var app = builder.Build();
 
