@@ -9,4 +9,5 @@ public interface ICountriesRepository
     Task<ActionResponse<IEnumerable<Country>>> GetAsync(PaginationDTO pagination);
     Task<ActionResponse<Country>> GetAsync(int countryId);
     Task<ActionResponse<IEnumerable<Country>>> GetAsync();
+    Task<ActionResponse<int>> GetTotalRecordsAsync(PaginationDTO pagination);
 }

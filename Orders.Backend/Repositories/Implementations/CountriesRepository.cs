@@ -22,6 +22,14 @@ public class CountriesRepository : GenericRepository<Country>, ICountriesReposit
         var queryable = _context.Countries
             .Include(c => c.States)
             .AsQueryable();
+
+        if (!string.IsNullOrEmpty(pagination.Filter))
+        {
+            // Use SQL LIKE for server-side translation
+            var pattern = $"%{pagination.Filter}%";
+            queryable = queryable.Where(c => EF.Functions.Like(c.Name, pattern));
+        }
+
         return new ActionResponse<IEnumerable<Country>>
         {
             WasSuccess = true,
@@ -67,4 +75,23 @@ public class CountriesRepository : GenericRepository<Country>, ICountriesReposit
             Result = country
         };
     }
+
+    public override async Task<ActionResponse<int>> GetTotalRecordsAsync(PaginationDTO pagination)
+    {
+        var queryable = _context.Countries.AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(pagination.Filter))
+        {
+            var pattern = $"%{pagination.Filter}%";
+            queryable = queryable.Where(x => EF.Functions.Like(x.Name, pattern));
+        }
+
+        double count = await queryable.CountAsync();
+        return new ActionResponse<int>
+        {
+            WasSuccess = true,
+            Result = (int)count
+        };
+    }
+
 }

@@ -24,6 +24,13 @@ public class StatesRepository : GenericRepository<State>, IStatesRepository
             .Where(x => x.Country!.Id == pagination.Id)
             .AsQueryable();
 
+        if (!string.IsNullOrWhiteSpace(pagination.Filter))
+        {
+            // Use SQL LIKE for server-side translation
+            var pattern = $"%{pagination.Filter}%";
+            queryable = queryable.Where(c => EF.Functions.Like(c.Name, pattern));
+        }
+
         return new ActionResponse<IEnumerable<State>>
         {
             WasSuccess = true,
@@ -39,6 +46,13 @@ public class StatesRepository : GenericRepository<State>, IStatesRepository
         var queryable = _context.States
             .Where(x => x.Country!.Id == pagination.Id)
             .AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(pagination.Filter))
+        {
+            // Use SQL LIKE for server-side translation
+            var pattern = $"%{pagination.Filter}%";
+            queryable = queryable.Where(c => EF.Functions.Like(c.Name, pattern));
+        }
 
         double count = await queryable.CountAsync();
         return new ActionResponse<int>
